@@ -1,5 +1,5 @@
 import json
-from typing import Tuple, Dict
+from typing import Tuple, Dict, Set
 
 import networkx as nx
 from datasets import Dataset
@@ -21,6 +21,44 @@ from KG_LM.utils.Datasets.factories.SimpleQuestionsSentences import SimpleQuesti
 from KG_LM.utils.Datasets.factories.SimpleQuestionsStar import SimpleQuestionsStar
 
 from KG_LM.configuration import DatasetConfig
+
+# Global cache for TRiREx training entities to avoid reloading
+_TRIREX_TRAIN_ENTITIES_CACHE = None
+
+
+def get_trirex_train_entities(conf: DatasetConfig) -> Set[str]:
+    """
+    Get the set of entity IDs from TRiREx training split.
+    Uses caching to avoid reloading for multiple factory calls.
+    """
+    global _TRIREX_TRAIN_ENTITIES_CACHE
+    
+    if _TRIREX_TRAIN_ENTITIES_CACHE is not None:
+        return _TRIREX_TRAIN_ENTITIES_CACHE
+    
+    print("Loading TRiREx train entities for filtering...")
+    
+    # Load TRiREx train split
+    if conf.lite:
+        trirex_builder = TriRExLite(conf.base_path)
+    else:
+        trirex_builder = TriREx(conf.base_path)
+    
+    if not trirex_builder.info.splits:
+        trirex_builder.download_and_prepare()
+    
+    train_dataset = trirex_builder.as_dataset(split="train")
+    
+    # Extract entity IDs
+    entity_ids = set()
+    for sample in tqdm(train_dataset, desc="Extracting TRiREx train entities"):
+        if 'subject' in sample and 'id' in sample['subject']:
+            entity_ids.add(sample['subject']['id'])
+    
+    _TRIREX_TRAIN_ENTITIES_CACHE = entity_ids
+    print(f"Cached {len(entity_ids)} TRiREx training entities for filtering")
+    
+    return entity_ids
 
 def trex_factory(conf: DatasetConfig) -> Tuple[Dataset, Dataset, Dataset]:
     if conf.lite:

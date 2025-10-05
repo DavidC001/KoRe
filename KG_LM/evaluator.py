@@ -181,6 +181,26 @@ def compute_hit_k(
     
     return hit_k_batch_correct, tot_num_tokens, total_objects
 
+
+class BaseLLM:
+    """Base class for LLM evaluators."""
+    def __init__(self,model):
+        self.model = model
+        
+    def __call__(self, **kwds):
+        """Return the model output without LoRA layers."""
+        with self.model.llm.disable_adapter():
+            results = self.model(**kwds)
+
+        return results
+
+    def generate(self, **kwds):
+        """Generate text using the model."""
+        with self.model.llm.disable_adapter():
+            generated = self.model.generate(**kwds)
+        return generated
+
+
 class KGLFMEvaluator:
     """Comprehensive evaluator for KG-LFM model."""
     
@@ -227,16 +247,24 @@ class KGLFMEvaluator:
         # Initialize metrics storage
         self.results = defaultdict(dict)
         
+        self.evaluations = {
+            # 'perplexity': self.compute_perplexity,
+            'hit_at_k': self.compute_hit_k_metrics,
+        }
+        
     def remove_kg_stuff(self, batch) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         """Remove KG-related tokens from input_ids and attention_mask."""
         
         batch_sentences = []
+        conversations = []
         for sample_idx in range(len(batch["input_ids"])):
             conversation = batch["conversations"][sample_idx]
             
             # remove the one with the special token
             kg_string = SPECIAL_KG_TOKEN
             conversation = [turn for turn in conversation if kg_string not in turn['content']]
+
+            conversations.append(conversation)
 
             # If tokenizer has a apply_chat_template method, use it
             try:
@@ -277,6 +305,7 @@ class KGLFMEvaluator:
 
         out = {
             "question_ids": batch["question_ids"],
+            "conversations": conversations,
             "sentences": batch_sentences,
             "objects": batch["objects"],
             "input_ids": tokenized['input_ids'],
@@ -317,13 +346,6 @@ class KGLFMEvaluator:
             } for i in range(num_turns)]
 
         return self.remove_kg_stuff(batch)
-        
-    def llm_no_lora(self, **kwargs):
-        """Return the model output without LoRA layers."""
-        with self.model.llm.disable_adapter():
-            results = self.model(**kwargs)
-            
-        return results
 
     def load_model(self):
         """Load the best trained model."""
@@ -358,9 +380,8 @@ class KGLFMEvaluator:
                     self.clean_model.eval()
 
                 elif self.model_config.use_lora:
-                    self.clean_model = self.llm_no_lora
+                    self.clean_model = BaseLLM(self.model)
                     self.clean_tokenizer = self.tokenizer
-                    
                 else:
                     self.clean_model = self.model
                     self.clean_tokenizer = self.tokenizer
@@ -794,10 +815,7 @@ class KGLFMEvaluator:
         self.prepare_accelerator()
         
         # Run all evaluations
-        evaluations = {
-            # 'perplexity': self.compute_perplexity,
-            'hit_at_k': self.compute_hit_k_metrics,
-        }
+        evaluations = self.evaluations
         
         # Run evaluations
         for eval_name, eval_func in evaluations.items():

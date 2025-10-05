@@ -446,8 +446,7 @@ class KG_LMMetaForCausalLM(ABC):
                 labels,
                 RVQ_loss,
                 None,  # No indices for graph embeddings
-                None,  # No quantized tokens
-                None   # No quantized indices
+                None  # No quantized tokens
             )
 
         logging.debug(f"Preparing inputs and labels for multimodal processing with {len(graphs)} graphs...")
@@ -536,7 +535,7 @@ class KG_LMMetaForCausalLM(ABC):
                 end_idx = kg_token_indices[i+1]
                 text_segments.append(cur_input_embeds[start_idx:end_idx])
                 label_segments.append(cur_labels[start_idx:end_idx])
-
+            
             # Reconstruct the sequence by interleaving text segments with graph embeddings
             cur_new_input_embeds = []
             cur_new_labels = []

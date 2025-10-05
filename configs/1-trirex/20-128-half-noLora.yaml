@@ -1,0 +1,73 @@
+seed: 42
+
+dataset:
+  name: "trirex"
+  lite: False
+  base_path: "/leonardo_scratch/fast/IscrC_KG-LFM/dataset/KG_LFM"
+  graph_embs_base_path: "/leonardo_scratch/fast/IscrC_KG-LFM/dataset/KG_LFM/graph_embs"
+  preload_nodes_embeddings: False
+
+train_conf:
+  run_name: "tri-KG-LFM-20-128-half-noLoRA"
+    
+  epochs: 10
+  early_stopping_patience: 2
+  scheduler_patience: 1
+  scheduler_metric: "Hit@10"
+  scheduler_mode: "max"
+  steps_train: 8192
+  eval_perc: 0.25
+
+  gradient_accumulation_steps: 2 # more randomness
+  clip_grad_norm: 1.0
+
+  KG_learning_rate: 5e-4
+  LLM_learning_rate: 1e-5
+  weight_decay: 0.01
+
+  rvq_loss_weight: 1
+  
+  checkpoint_dir: "/leonardo_work/IscrC_KG-LFM/checkpoints"
+  checkpoint_frequency: 5
+  
+  resume : True
+
+  dataloader:
+    batch_size: 8
+    shuffle: True
+    num_workers: 2
+
+    include_graphs: True
+    return_tensors: "pt"
+
+    pin_memory: False
+    persistent_workers: False
+
+model:
+  # LLM Configuration
+  llm_model_name: "Qwen/Qwen3-8B"
+  
+  # Graph Encoder Configuration
+  graph_pooling: False
+
+  dropout: 0.2  
+  num_heads: 16
+  num_quantizers: 20
+  codebook_size: 128
+  codebook_dim: 0
+  shared_codebook: False
+  dead_codebook_threshold: 0.0625 
+  # {total batch_size}/{codebook_size}/2 
+  # meaning that the code need to be used around once every {codebook_size}*2 samples
+  
+  # Training Configuration
+  tune_language_model: False
+  tune_kg_encoder: True
+  
+  use_lora: False
+  lora_r: 4
+  lora_alpha: 8
+  lora_target_modules: ["q_proj", "k_proj", "v_proj", "o_proj"]
+
+  # Graph Node Embedding Configuration
+  graph_nodes_embedding_model: "Qwen/Qwen3-Embedding-8B"
