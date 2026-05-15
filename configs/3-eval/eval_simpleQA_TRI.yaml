@@ -1,14 +1,14 @@
 seed: 42
 
 dataset:
-  name: "trirex-bite"
+  name: "simple-questions"
   lite: False
   base_path: "/leonardo_scratch/fast/IscrC_KG-LFM/dataset/KG_LFM"
   graph_embs_base_path: "/leonardo_scratch/fast/IscrC_KG-LFM/dataset/KG_LFM/graph_embs"
   preload_nodes_embeddings: False
 
 train_conf:
-  start_from_checkpoint: "/leonardo_work/IscrC_KG-LFM/checkpoints/tri-KG-LFM-20-128-half-kvqo/best_model"
+  start_from_checkpoint: "/leonardo_work/IscrC_KG-LFM/checkpoints/KoRe-base/best_model"
 
   dataloader:
     shuffle: True

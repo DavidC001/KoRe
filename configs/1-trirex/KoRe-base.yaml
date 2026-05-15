@@ -2,13 +2,13 @@ seed: 42
 
 dataset:
   name: "trirex"
-  lite: True
+  lite: False
   base_path: "/leonardo_scratch/fast/IscrC_KG-LFM/dataset/KG_LFM"
   graph_embs_base_path: "/leonardo_scratch/fast/IscrC_KG-LFM/dataset/KG_LFM/graph_embs"
   preload_nodes_embeddings: False
 
 train_conf:
-  run_name: "tri-KG-LFM-20-128-half-kvqo-DECODER"
+  run_name: "KoRe-base"
     
   epochs: 10
   early_stopping_patience: 2
@@ -57,8 +57,8 @@ model:
   codebook_dim: 0
   shared_codebook: False
   dead_codebook_threshold: 0.0625 
-  # {total batch_size}/{codebook_size}/2 
-  # meaning that the code need to be used around once every {codebook_size}*2 samples
+  # {total batch_size}/{codebook_size}/4
+  # meaning that the code need to be used around once every {codebook_size}*4 samples
   
   # Training Configuration
   tune_language_model: False
@@ -68,8 +68,6 @@ model:
   lora_r: 4
   lora_alpha: 8
   lora_target_modules: ["q_proj", "k_proj", "v_proj", "o_proj"]
-
-  use_kg_decoder: True
 
   # Graph Node Embedding Configuration
   graph_nodes_embedding_model: "Qwen/Qwen3-Embedding-8B"

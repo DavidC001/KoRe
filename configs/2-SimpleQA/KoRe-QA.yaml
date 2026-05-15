@@ -1,22 +1,22 @@
 seed: 42
 
 dataset:
-  name: "trirex"
-  lite: False
+  name: "simple-questions"
+  lite: True
   base_path: "/leonardo_scratch/fast/IscrC_KG-LFM/dataset/KG_LFM"
   graph_embs_base_path: "/leonardo_scratch/fast/IscrC_KG-LFM/dataset/KG_LFM/graph_embs"
   preload_nodes_embeddings: False
 
 train_conf:
-  run_name: "tri-KG-LFM-10-1024"
+  run_name: "KoRe-QA"
     
   epochs: 10
   early_stopping_patience: 2
   scheduler_patience: 1
   scheduler_metric: "Hit@10"
   scheduler_mode: "max"
-  steps_train: 8192
-  eval_perc: 0.25
+  steps_train: 1.0
+  eval_perc: 1.0
 
   gradient_accumulation_steps: 2 # more randomness
   clip_grad_norm: 1.0
@@ -31,6 +31,7 @@ train_conf:
   checkpoint_frequency: 5
   
   resume : True
+  start_from_checkpoint: "/leonardo_work/IscrC_KG-LFM/checkpoints/KoRe-base/best_model"
 
   dataloader:
     batch_size: 8
@@ -52,13 +53,13 @@ model:
 
   dropout: 0.2  
   num_heads: 16
-  num_quantizers: 10
-  codebook_size: 1024
+  num_quantizers: 20
+  codebook_size: 128
   codebook_dim: 0
   shared_codebook: False
-  dead_codebook_threshold: 0.015625 
-  # {total batch_size}/{codebook_size}/2 
-  # meaning that the code need to be used around once every {codebook_size}*2 samples
+  dead_codebook_threshold: 0.0625 
+  # {total batch_size}/{codebook_size}/4
+  # meaning that the code need to be used around once every {codebook_size}*4 samples
   
   # Training Configuration
   tune_language_model: False
@@ -67,7 +68,7 @@ model:
   use_lora: True
   lora_r: 4
   lora_alpha: 8
-  lora_target_modules: ["q_proj", "k_proj"]
+  lora_target_modules: ["q_proj", "k_proj", "v_proj", "o_proj"]
 
   # Graph Node Embedding Configuration
   graph_nodes_embedding_model: "Qwen/Qwen3-Embedding-8B"

@@ -1,7 +1,7 @@
 seed: 42
 
 dataset:
-  name: "trirex-bite"
+  name: "simple-questions"
   lite: False
   base_path: "/leonardo_scratch/fast/IscrC_KG-LFM/dataset/KG_LFM"
   graph_embs_base_path: "/leonardo_scratch/fast/IscrC_KG-LFM/dataset/KG_LFM/graph_embs"

@@ -1,0 +1,25 @@
+seed: 42
+
+dataset:
+  name: "trirex"
+  lite: False
+  base_path: "/leonardo_scratch/fast/IscrC_KG-LFM/dataset/KG_LFM"
+  graph_embs_base_path: "/leonardo_scratch/fast/IscrC_KG-LFM/dataset/KG_LFM/graph_embs"
+  preload_nodes_embeddings: False
+
+train_conf:
+  start_from_checkpoint: "/leonardo_work/IscrC_KG-LFM/checkpoints/KoRe-base/best_model"
+
+  dataloader:
+    shuffle: True
+    num_workers: 1
+
+    include_graphs: True
+    return_tensors: "pt"
+
+    pin_memory: False
+    persistent_workers: False
+
+model:
+  # Graph Node Embedding Configuration
+  graph_nodes_embedding_model: "Qwen/Qwen3-Embedding-8B"

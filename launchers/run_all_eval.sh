@@ -65,10 +65,10 @@ MODE="$MODE_OR_DIR"
 if [ "$MODE" = "all" ]; then
     # Build config files list based on selected datasets
     declare -A DATASET_TO_CONFIG=(
-        [trirex-bite]="configs/4-eval/eval_bite.yaml"
-        [trirex]="configs/4-eval/eval_trirex.yaml"
-        [simple-questions]="configs/4-eval/eval_simpleQA.yaml"
-        [web-qsp]="configs/4-eval/eval_web_qsp.yaml"
+        [trirex-bite]="configs/3-eval/eval_bite.yaml"
+        [trirex]="configs/3-eval/eval_trirex.yaml"
+        [simple-questions]="configs/3-eval/eval_simpleQA.yaml"
+        [web-qsp]="configs/3-eval/eval_web_qsp.yaml"
     )
     
     for dataset in "${SELECTED_DATASETS[@]}"; do
@@ -155,10 +155,10 @@ if [ "$MODE" = "models" ]; then
 
     # Dataset -> template mapping
     declare -A DATASET_TEMPLATES=(
-        [trirex-bite]="configs/4-eval/eval_bite.yaml"
-        [trirex]="configs/4-eval/eval_trirex.yaml"
-        [simple-questions]="configs/4-eval/eval_simpleQA.yaml"
-        [web-qsp]="configs/4-eval/eval_web_qsp.yaml"
+        [trirex-bite]="configs/3-eval/eval_bite.yaml"
+        [trirex]="configs/3-eval/eval_trirex.yaml"
+        [simple-questions]="configs/3-eval/eval_simpleQA.yaml"
+        [web-qsp]="configs/3-eval/eval_web_qsp.yaml"
     )
 
     GEN_CFG_DIR="launchers/generated_eval_configs"
