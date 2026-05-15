@@ -7,7 +7,7 @@ import wandb
 def main():
     """Main function with argument parsing."""
     parser = argparse.ArgumentParser(description="Train KG-LFM model")
-    parser.add_argument("--config", type=str, default="configs/1-trirex/config.yaml", help="Path to configuration file.")
+    parser.add_argument("--config", type=str, default="configs/base_config.yaml", help="Path to configuration file.")
     parser.add_argument("--time_budget", type=int, default=None, help="Time budget for training in seconds.")
     parser.add_argument("--debug", action="store_true", help="Enable debug mode for training.")
     
