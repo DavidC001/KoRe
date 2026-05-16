@@ -281,12 +281,12 @@ class KGEncoder(nn.Module):
         skip = self.skip_to_final(tokens)                         # [B, Q, final_D]
         tokens = self.output_norm(proj + skip)                    # residual in final space
 
-        # # per-batch standardization
-        # g_mu = tokens.mean(dim=(-2,-1), keepdim=True)
-        # g_std = tokens.std(dim=(-2,-1), keepdim=True).clamp_min(1e-6)
-        # tokens = (tokens - g_mu) / g_std
-        # # match text emb std
-        # tokens = tokens * self.text_embs_std + self.kg_bias
+        # token standardization
+        g_mu = tokens.mean(dim=(-2,-1), keepdim=True)
+        g_std = tokens.std(dim=(-2,-1), keepdim=True).clamp_min(1e-6)
+        tokens = (tokens - g_mu) / g_std
+        # match text emb std
+        tokens = tokens * self.text_embs_std + self.kg_bias
         
         # add bounding tokens if needed
         if self.bounding_tokens:
